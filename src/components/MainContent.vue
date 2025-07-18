@@ -1712,7 +1712,8 @@ const handleCardClick = (cardType) => {
 
   switch (cardType) {
     case 'stock-summary':
-      inputText.value = '2025년 7월 기준 최근 3개월 내 업데이트된 농어촌공사 규정, 메뉴얼, 업무 지침을 검색해주세요. 신규 제정된 규정, 개정된 업무 프ㅗ세스 등 변경된 최신 자료를 정리해서 알려주세요.'
+      inputText.value =
+        '2025년 7월 기준 최근 3개월 내 업데이트된 농어촌공사 규정, 메뉴얼, 업무 지침을 검색해주세요. 신규 제정된 규정, 개정된 업무 프로세스 등 변경된 최신 자료를 정리해서 알려주세요.'
       handleSubmit()
       break
     case 'web-search':
@@ -1721,7 +1722,8 @@ const handleCardClick = (cardType) => {
       handleSubmit()
       break
     case 'news-summary':
-      inputText.value = '농어촌공사 관련 업무 분야의 최신 동향을 종합 분석해주세요.우리 기관의 최근 정책 변화와 정부 농어촌 정챙ㄱ 업계 트렌드, 언론 보도를 통합하여 실무진이 알아야할 핵심 인사이트를 제공해주세요.'
+      inputText.value =
+        '농어촌공사 관련 업무 분야의 최신 동향을 종합 분석해주세요.우리 기관의 최근 정책 변화와 정부 농어촌 정책 업계 트렌드, 언론 보도를 통합하여 실무진이 알아야할 핵심 인사이트를 제공해주세요.'
       handleSubmit()
       break
   }
