@@ -22,8 +22,8 @@
               >님
             </h1>
             <p class="welcome-subtitle">
-              금융의 판을 바꿀 생성형 AI 전략<br />
-              오늘 오후 2시, 대강당에서 만나보세요.
+              일하는 방식을 바꾸는 AI 파트너<br />
+              스마트하고 효율적인 업무를 경험해보세요.
             </p>
           </div>
 
@@ -811,7 +811,7 @@ const isImageMakingMode = ref(false)
 
 // 모델 선택
 const ownerNm = '이호철'
-const shortAIproductNm = '농어촌'
+const shortAIproductNm = 'KRC '
 const selectedModel = ref('모델선택')
 const isModelDropdownOpen = ref(false)
 const modelOptions = ref([
@@ -846,22 +846,22 @@ const conversationHistory = ref([])
 const featureCards = ref([
   {
     type: 'stock-summary',
-    title: '첫번째 카드 제목',
-    description: '테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트',
+    title: '새소식으로 시작하는 업무',
+    description: '바뀐 규정과 업데이트 소식을 한눈에',
     iconBg: '#E5EFFC',
     icon: firstCardIcon,
   },
   {
     type: 'web-search',
-    title: '두번째 카드 제목',
-    description: '테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트',
+    title: '궁금한 건 바로 웹 검색',
+    description: '지금 알고싶은 정보를 실시간으로',
     iconBg: '#E5EFFC',
     icon: secondCardIcon,
   },
   {
     type: 'news-summary',
-    title: '세번째 카드 제목',
-    description: '테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트테스트',
+    title: '논어촌 안밖의 이야기',
+    description: '우리 안밖의 소식을 한데 모아',
     iconBg: '#E5EFFC',
     icon: thirdCardIcon,
   },
@@ -1712,16 +1712,16 @@ const handleCardClick = (cardType) => {
 
   switch (cardType) {
     case 'stock-summary':
-      inputText.value = '넌 누구야?'
+      inputText.value = '2025년 7월 기준 최근 3개월 내 업데이트된 농어촌공사 규정, 메뉴얼, 업무 지침을 검색해주세요. 신규 제정된 규정, 개정된 업무 프ㅗ세스 등 변경된 최신 자료를 정리해서 알려주세요.'
       handleSubmit()
       break
     case 'web-search':
       isOpenAIWebSearchMode.value = true
-      inputText.value = '한국농어촌공사에 대해 알려줄 수 있어?'
+      inputText.value = '한국농어촌공사와 유사한 해외 농업공사들의 최신 운영 동향을 알려주세요.'
       handleSubmit()
       break
     case 'news-summary':
-      inputText.value = '한국농어촌공사의 뉴스에 대해서 정리해줘'
+      inputText.value = '농어촌공사 관련 업무 분야의 최신 동향을 종합 분석해주세요.우리 기관의 최근 정책 변화와 정부 농어촌 정챙ㄱ 업계 트렌드, 언론 보도를 통합하여 실무진이 알아야할 핵심 인사이트를 제공해주세요.'
       handleSubmit()
       break
   }
