@@ -860,7 +860,7 @@ const featureCards = ref([
   },
   {
     type: 'news-summary',
-    title: '논어촌 안밖의 이야기',
+    title: '농어촌 안밖의 이야기',
     description: '우리 안밖의 소식을 한데 모아',
     iconBg: '#E5EFFC',
     icon: thirdCardIcon,
