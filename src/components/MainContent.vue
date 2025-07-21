@@ -139,7 +139,12 @@
 
                       <!-- ✨ 웹 검색 소스 아이콘들 (OpenAI 웹 검색인 경우만) -->
                       <div
-                        v-if="!msg.isTyping && msg.sources && msg.sources.length > 0"
+                        v-if="
+                          isOpenAIWebSearchMode &&
+                          !msg.isTyping &&
+                          msg.sources &&
+                          msg.sources.length > 0
+                        "
                         class="openai-web-sources"
                       >
                         <div class="sources-horizontal">
@@ -170,7 +175,12 @@
 
                         <!-- 🖼️ 이미지 썸네일 4개 (OpenAI 웹 검색 이미지) -->
                         <div
-                          v-if="!msg.isTyping && msg.images && msg.images.length > 0"
+                          v-if="
+                            isOpenAIWebSearchMode &&
+                            !msg.isTyping &&
+                            msg.images &&
+                            msg.images.length > 0
+                          "
                           class="openai-web-images"
                         >
                           <div class="images-grid-container">
@@ -706,7 +716,7 @@
                   <div v-if="isModelDropdownOpen" class="custom-dropdown" @click.stop>
                     <div
                       v-for="model in modelOptions"
-                      :key="model.value"
+                      :key="model.label"
                       class="dropdown-option"
                       :class="{ selected: selectedModel === model.label }"
                       @click="selectModel(model.label)"
@@ -869,6 +879,10 @@ const featureCards = ref([
 
 // 이벤트 정의
 const emit = defineEmits(['card-clicked', 'icon-clicked', 'message-sent'])
+
+/* AI:ON-U custom agent 세션 유지용 */
+const conversationId = ref('') // 개인 AI Agent 세션 유지용
+const userId = ref('user_' + Date.now()) // 사용자 고유 식별자
 
 /**
  * 🧹 모든 비동기 작업 안전하게 정리하는 함수
@@ -1371,6 +1385,7 @@ const typeMessage = async (message, messageIndex, options = {}) => {
                   scrollElement.scrollTop = scrollElement.scrollHeight
                 }
               }
+              // eslint-disable-next-line no-unused-vars
             } catch (scrollError) {
               // 스크롤 에러는 무시
             }
@@ -1405,10 +1420,9 @@ const typeMessage = async (message, messageIndex, options = {}) => {
   })
 }
 
-/**
- * 🛡️ 안전한 ChatGPT API 호출 함수
- */
-const sendChatGPTMessage = async (message) => {
+// 2. 기존 sendChatGPTMessage 함수를 개인 AI Agent용으로 변경
+const sendPersonalAgentMessage = async (message) => {
+  // 기존과 동일한 중복 체크
   if (isTyping.value) {
     console.log('이미 타이핑 중이므로 요청 무시')
     return
@@ -1417,6 +1431,12 @@ const sendChatGPTMessage = async (message) => {
   isTyping.value = true
   hasChatResults.value = true
 
+  // RAG 기능 없을 경우에 대한 추가 로직
+  if (!message.includes('[POC-RAG]')) {
+    message = '[POC-RAG] ' + message
+  }
+
+  // 사용자 메시지 추가 (기존과 동일)
   const userMessage = {
     type: 'user',
     content: message,
@@ -1424,6 +1444,7 @@ const sendChatGPTMessage = async (message) => {
   }
   chatMessages.value.push(userMessage)
 
+  // AI 메시지 추가 (기존과 동일)
   const aiMessage = {
     type: 'ai',
     content: '',
@@ -1434,6 +1455,7 @@ const sendChatGPTMessage = async (message) => {
   const aiMessageIndex = chatMessages.value.length - 1
   typingMessageId.value = aiMessageIndex
 
+  // nextTick 및 스크롤 처리 (기존과 동일)
   await nextTick()
   try {
     const scrollElement = document.querySelector('.chat-results-scroll')
@@ -1445,16 +1467,19 @@ const sendChatGPTMessage = async (message) => {
   }
 
   try {
-    console.log('ChatGPT API 호출 시작...')
+    console.log('개인 AI Agent API 호출 시작...')
 
-    const response = await fetch('/api/openai-chat', {
+    // 개인 AI Agent API 호출
+    const response = await fetch('/api/personal-agent-chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         message: message,
-        conversationHistory: conversationHistory.value,
+        conversationId: conversationId.value, // 세션 유지
+        userId: userId.value,
+        files: [], // 나중에 파일 업로드 기능 추가시 사용
       }),
     })
 
@@ -1467,8 +1492,31 @@ const sendChatGPTMessage = async (message) => {
     const data = await response.json()
 
     if (data.success) {
+      // conversation_id 업데이트 (세션 유지를 위해 중요!)
+      if (data.conversation_id) {
+        conversationId.value = data.conversation_id
+        console.log('[Vue] 대화 ID 업데이트:', data.conversation_id)
+      }
+
       if (chatMessages.value[aiMessageIndex]) {
         chatMessages.value[aiMessageIndex].isTyping = false
+
+        // 메타데이터 저장 (개인 AI Agent 전용)
+        if (data.metadata) {
+          chatMessages.value[aiMessageIndex].metadata = data.metadata
+
+          // 참조 자료가 있다면 sources에 추가
+          if (data.metadata.retriever_resources && data.metadata.retriever_resources.length > 0) {
+            chatMessages.value[aiMessageIndex].sources = data.metadata.retriever_resources.map(
+              (resource) => ({
+                title: resource.document_name || resource.dataset_name,
+                url: resource.url || '#',
+                snippet: resource.content || '',
+                score: resource.score,
+              }),
+            )
+          }
+        }
 
         try {
           await typeMessage(data.response, aiMessageIndex)
@@ -1479,27 +1527,24 @@ const sendChatGPTMessage = async (message) => {
           }
         }
 
+        // conversationHistory 업데이트 (기존과 동일 - OpenAI 형식으로 유지)
         conversationHistory.value.push(
           { role: 'user', content: message },
           { role: 'assistant', content: data.response },
         )
-
         if (conversationHistory.value.length > 20) {
           conversationHistory.value = conversationHistory.value.slice(-20)
         }
       }
-
-      console.log('ChatGPT 응답 성공')
+      console.log('개인 AI Agent 응답 성공')
     } else {
       throw new Error(data.error || '알 수 없는 오류가 발생했습니다.')
     }
   } catch (error) {
-    console.error('ChatGPT API 오류:', error)
-
+    console.error('개인 AI Agent API 오류:', error)
     if (chatMessages.value[aiMessageIndex]) {
       chatMessages.value[aiMessageIndex].isTyping = false
       const errorText = `죄송합니다. 오류가 발생했습니다: ${error.message}`
-
       try {
         await typeMessage(errorText, aiMessageIndex)
       } catch (typingError) {
@@ -1508,6 +1553,7 @@ const sendChatGPTMessage = async (message) => {
       }
     }
   } finally {
+    // 기존과 동일한 상태 정리
     if (isTyping.value) {
       isTyping.value = false
     }
@@ -1616,6 +1662,7 @@ const extractDomain = (url, options = {}) => {
 
     // URL 파싱 실패 시, URL 자체에서 도메인 추출 시도
     try {
+      // eslint-disable-next-line no-useless-escape
       const match = url.match(/https?:\/\/([^\/\?#]+)/i)
       if (match && match[1]) {
         return match[1].replace('www.', '')
@@ -1697,7 +1744,7 @@ const handleSubmit = () => {
   if (isOpenAIWebSearchMode.value) {
     sendOpenAIWebSearch(message)
   } else {
-    sendChatGPTMessage(message)
+    sendPersonalAgentMessage(message)
   }
 
   inputText.value = ''
@@ -1713,7 +1760,7 @@ const handleCardClick = (cardType) => {
   switch (cardType) {
     case 'stock-summary':
       inputText.value =
-        '2025년 7월 기준 최근 3개월 내 업데이트된 농어촌공사 규정, 메뉴얼, 업무 지침을 검색해주세요. 신규 제정된 규정, 개정된 업무 프로세스 등 변경된 최신 자료를 정리해서 알려주세요.'
+        '[POC-RAG] 2025년 7월 기준 최근 3개월 내 업데이트된 농어촌공사 규정, 메뉴얼, 업무 지침을 검색해주세요. 신규 제정된 규정, 개정된 업무 프로세스 등 변경된 최신 자료를 정리해서 알려주세요.'
       handleSubmit()
       break
     case 'web-search':
@@ -1723,7 +1770,7 @@ const handleCardClick = (cardType) => {
       break
     case 'news-summary':
       inputText.value =
-        '농어촌공사 관련 업무 분야의 최신 동향을 종합 분석해주세요.우리 기관의 최근 정책 변화와 정부 농어촌 정책 업계 트렌드, 언론 보도를 통합하여 실무진이 알아야할 핵심 인사이트를 제공해주세요.'
+        '[POC-RAG] 농어촌공사 관련 업무 분야의 최신 동향을 종합 분석해주세요.우리 기관의 최근 정책 변화와 정부 농어촌 정책 업계 트렌드, 언론 보도를 통합하여 실무진이 알아야할 핵심 인사이트를 제공해주세요.'
       handleSubmit()
       break
   }
