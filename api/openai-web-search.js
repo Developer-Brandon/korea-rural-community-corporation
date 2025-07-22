@@ -17,19 +17,19 @@ const openai = process.env.OPENAI_API_KEY
 // 🎯 2025년 최신 정보 하드코딩 (확실한 정보 제공)
 const LATEST_INFO_2025 = {
   '농어촌공사 사장': {
-    name: '김인수',
+    name: '김인중',
     title: '한국농어촌공사 사장',
     year: '2025',
     source: '한국농어촌공사 공식 발표',
   },
   '농어촌공사 현재 사장': {
-    name: '김인수',
+    name: '김인중',
     title: '한국농어촌공사 사장',
     year: '2025',
     source: '한국농어촌공사 공식 발표',
   },
   'KRC 사장': {
-    name: '김인수',
+    name: '김인중',
     title: '한국농어촌공사(KRC) 사장',
     year: '2025',
     source: '한국농어촌공사 공식 발표',
@@ -152,13 +152,13 @@ function generatePersonSearchKeywords(query, latestInfo = null) {
   // 🎯 1. 하드코딩된 정보가 있으면 기업명 + 인물명 조합으로 검색 (기업명 우선 배치)
   if (latestInfo && latestInfo.name) {
     keywords.push(
-      `한국농어촌공사 ${latestInfo.name}`, // "한국농어촌공사 김인수" (최우선)
-      `한국농어촌공사 사장 ${latestInfo.name}`, // "한국농어촌공사 사장 김인수"
-      `KRC ${latestInfo.name}`, // "KRC 김인수"
-      `KRC 사장 ${latestInfo.name}`, // "KRC 사장 김인수"
-      `농어촌공사 ${latestInfo.name}`, // "농어촌공사 김인수"
-      `농어촌공사 사장 ${latestInfo.name}`, // "농어촌공사 사장 김인수"
-      `${latestInfo.title} ${latestInfo.name}`, // "한국농어촌공사 사장 김인수"
+      `한국농어촌공사 ${latestInfo.name}`, // "한국농어촌공사 김인중" (최우선)
+      `한국농어촌공사 사장 ${latestInfo.name}`, // "한국농어촌공사 사장 김인중"
+      `KRC ${latestInfo.name}`, // "KRC 김인중"
+      `KRC 사장 ${latestInfo.name}`, // "KRC 사장 김인중"
+      `농어촌공사 ${latestInfo.name}`, // "농어촌공사 김인중"
+      `농어촌공사 사장 ${latestInfo.name}`, // "농어촌공사 사장 김인중"
+      `${latestInfo.title} ${latestInfo.name}`, // "한국농어촌공사 사장 김인중"
     )
   }
 
