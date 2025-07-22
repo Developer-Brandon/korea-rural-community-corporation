@@ -1765,7 +1765,7 @@ const handleCardClick = (cardType) => {
       break
     case 'web-search':
       isOpenAIWebSearchMode.value = true
-      inputText.value = '한국농어촌공사와 유사한 해외 농업공사들의 최신 운영 동향을 알려주세요.'
+      inputText.value = '한국농어촌공사는 회사에 대해 상세하게 알려줘'
       handleSubmit()
       break
     case 'news-summary':
