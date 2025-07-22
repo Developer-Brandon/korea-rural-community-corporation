@@ -209,30 +209,6 @@
                             </div>
                           </div>
                         </div>
-
-                        <!-- 🔍 디버깅용 임시 정보 표시 -->
-                        <div
-                          v-if="!msg.isTyping"
-                          style="
-                            background: #f0f0f0;
-                            padding: 8px;
-                            margin: 8px 0;
-                            font-size: 12px;
-                            border-radius: 4px;
-                          "
-                        >
-                          <div><strong>디버깅 정보:</strong></div>
-                          <div>- isOpenAIWebSearchMode: {{ isOpenAIWebSearchMode }}</div>
-                          <div>- msg.isTyping: {{ msg.isTyping }}</div>
-                          <div>- msg.references 존재: {{ !!msg.references }}</div>
-                          <div>
-                            - msg.references 길이:
-                            {{ msg.references ? msg.references.length : 'null' }}
-                          </div>
-                          <div v-if="msg.references">
-                            - references 내용: {{ JSON.stringify(msg.references, null, 2) }}
-                          </div>
-                        </div>
                       </div>
 
                       <!-- 📄 POC-RAG 참조문서 영역 (새로 추가!) -->
@@ -1912,7 +1888,7 @@ const handleCardClick = (cardType) => {
       break
     case 'web-search':
       isOpenAIWebSearchMode.value = true
-      inputText.value = '한국농어촌공사는 회사에 대해 상세하게 알려줘'
+      inputText.value = '한국농어촌공사라는 회사에 대해 상세하게 알려줘.'
       handleSubmit()
       break
     case 'news-summary':
