@@ -792,7 +792,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import firstCardIcon from '@/assets/icon/krcc-main-first-card-icon.svg'
+import firstCardIcon from '@/assets/icon/krcc-main-first-card-icon.png'
 import secondCardIcon from '@/assets/icon/krcc-main-second-card-icon.svg'
 import thirdCardIcon from '@/assets/icon/krcc-main-third-card-icon.svg'
 
@@ -2348,7 +2348,6 @@ defineExpose({
   box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
 }
 
-/* ======= 기존 스타일들 ======= */
 .blur-decoration {
   position: absolute;
   top: 15%;
@@ -2361,26 +2360,8 @@ defineExpose({
   filter: blur(110px);
   z-index: 0;
   pointer-events: none;
-
-  /* 기본 파란색 */
-  background: linear-gradient(372deg, #2563eb -0.64%, #1d4ed8 107.3%);
-}
-
-/* 초록색 오버레이 추가 */
-.blur-decoration::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: inherit;
-  /* KR 마크의 초록색에 맞춤 - 진한 초록색 */
-  background: linear-gradient(372deg, #16a34a -0.64%, #15803d 107.3%);
-  opacity: 0;
-  /* 매우 부드러운 페이드 인/아웃 */
-  animation: smoothFade 6s ease-in-out infinite;
-  transition: opacity 0.5s ease;
+  /* 더 밝은 초록색으로 변경 */
+  background: linear-gradient(372deg, #22c55e -0.64%, #16a34a 107.3%);
 }
 
 @keyframes smoothFade {
@@ -2441,7 +2422,7 @@ defineExpose({
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  margin: 0 auto 25px;
+  margin: 0 auto 35px;
   position: relative;
 
   /* 🎯 멀티 애니메이션 적용 */
@@ -2454,9 +2435,9 @@ defineExpose({
 
   /* 🔥 기본 파란색 글로우 효과 */
   box-shadow:
-    0 0 30px rgba(6, 43, 146, 0.3),
-    0 0 60px rgba(12, 44, 134, 0.2),
-    0 0 90px rgba(23, 63, 173, 0.1);
+    0 0 30px rgba(22, 163, 74, 0.4),
+    0 0 60px rgba(21, 128, 61, 0.3),
+    0 0 90px rgba(20, 83, 45, 0.2);
 
   /* 🎨 반짝이는 오버레이 효과 */
   &::before {
@@ -2489,7 +2470,6 @@ defineExpose({
 
 /* 🟢 초록색 글로우 오버레이 추가 */
 .welcome-orb {
-  /* 초록색 글로우 효과를 위한 추가 요소 */
   &:before {
     content: '';
     position: absolute;
@@ -2499,35 +2479,12 @@ defineExpose({
     bottom: 0;
     border-radius: 50%;
     box-shadow:
-      0 0 30px rgba(22, 163, 74, 0.4),
-      0 0 60px rgba(21, 128, 61, 0.3),
-      0 0 90px rgba(20, 83, 45, 0.2);
+      0 0 35px rgba(22, 163, 74, 0.5),
+      0 0 70px rgba(21, 128, 61, 0.35),
+      0 0 105px rgba(20, 83, 45, 0.25);
     opacity: 0;
     animation: orbColorShift 6s ease-in-out infinite;
     z-index: 0;
-    pointer-events: none;
-  }
-}
-
-/* 🟢 초록색 파티클 오버레이 */
-.welcome-orb {
-  /* 세 번째 가상 요소를 위한 래퍼 추가 */
-  position: relative;
-
-  &:hover::before {
-    content: '';
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    top: -20px;
-    left: -20px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(22, 163, 74, 0.15) 0%, transparent 70%);
-    opacity: 0;
-    animation:
-      orbParticleGreen 5s ease-in-out infinite,
-      orbColorShift 6s ease-in-out infinite;
-    z-index: -1;
     pointer-events: none;
   }
 }
@@ -2564,28 +2521,6 @@ defineExpose({
   }
 }
 
-/* 🔄 색상 변화하는 글로우 - 파란색에서 초록색으로 */
-@keyframes orbGlow {
-  0% {
-    box-shadow:
-      0 0 30px rgba(29, 78, 216, 0.3),
-      0 0 60px rgba(29, 78, 216, 0.2),
-      0 0 90px rgba(29, 78, 216, 0.1);
-  }
-  50% {
-    box-shadow:
-      0 0 35px rgba(22, 163, 74, 0.5),
-      0 0 70px rgba(21, 128, 61, 0.35),
-      0 0 105px rgba(20, 83, 45, 0.25);
-  }
-  100% {
-    box-shadow:
-      0 0 40px rgba(29, 78, 216, 0.5),
-      0 0 80px rgba(29, 78, 216, 0.3),
-      0 0 120px rgba(29, 78, 216, 0.2);
-  }
-}
-
 @keyframes orbPulse {
   0%,
   100% {
@@ -2616,21 +2551,6 @@ defineExpose({
   100% {
     transform: rotate(360deg);
     opacity: 0.3;
-  }
-}
-
-/* 🔄 색상 변화하는 파티클 - 파란색에서 초록색으로 */
-@keyframes orbParticle {
-  0%,
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.3;
-    background: radial-gradient(circle, rgba(29, 78, 216, 0.1) 0%, transparent 70%);
-  }
-  50% {
-    transform: scale(1.2) rotate(180deg);
-    opacity: 0.1;
-    background: radial-gradient(circle, rgba(22, 163, 74, 0.15) 0%, transparent 70%);
   }
 }
 
@@ -2680,26 +2600,10 @@ defineExpose({
   @media (max-width: 768px) {
     font-size: 25px;
   }
-
-  /* ✨ 이름 색상 변화 애니메이션 */
-  // span {
-  //   animation: nameColorShift 2.5s ease-in-out infinite;
-  // }
 }
 
-/* 🎨 이름 색상 변화 키프레임 */
-// @keyframes nameColorShift {
-//   0%,
-//   100% {
-//     color: #1d4ed8;
-//   }
-//   50% {
-//     color: #3b82f6;
-//   }
-// }
-
 .welcome-subtitle {
-  color: #5d8ad7;
+  color: #16a34a;
   text-align: center;
   font-family: Pretendard;
   font-size: 16px;
@@ -2800,18 +2704,19 @@ defineExpose({
   }
 
   /* 🎭 특별한 세 번째 카드 스타일 */
+
   &:nth-child(3) {
     background:
-      linear-gradient(180deg, rgba(10, 140, 241, 0) 0%, rgba(91, 134, 255, 0.2) 100%),
+      linear-gradient(180deg, rgba(21, 128, 61, 0) 0%, rgba(34, 197, 94, 0.2) 100%),
       linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 100%),
       rgba(255, 255, 255, 0.2);
 
     &::before {
       background: linear-gradient(
         45deg,
-        rgba(91, 134, 255, 0.15),
-        rgba(10, 140, 241, 0.15),
-        rgba(91, 134, 255, 0.15)
+        rgba(34, 197, 94, 0.15),
+        rgba(21, 128, 61, 0.15),
+        rgba(34, 197, 94, 0.15)
       );
     }
   }
@@ -3272,11 +3177,11 @@ defineExpose({
   line-height: 150%;
   letter-spacing: -0.36px;
 
-  /* 🖱️ 강제로 검은색 I-beam 커서 적용 */
-  cursor:
-    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="3" height="20" viewBox="0 0 3 20"><rect width="1" height="20" x="1" fill="black"/><rect width="3" height="2" y="0" fill="black"/><rect width="3" height="2" y="18" fill="black"/></svg>')
-      1 10,
-    text;
+  // /* 🖱️ 강제로 검은색 I-beam 커서 적용 */
+  // cursor:
+  //   url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="3" height="20" viewBox="0 0 3 20"><rect width="1" height="20" x="1" fill="black"/><rect width="3" height="2" y="0" fill="black"/><rect width="3" height="2" y="18" fill="black"/></svg>')
+  //     1 10,
+  //   text;
 
   &:focus {
     outline: none !important;
@@ -5102,7 +5007,7 @@ defineExpose({
 /* 사용자 이름 스타일 - 실제 작동하는 버전 */
 .owner-name {
   font-weight: 700;
-  background: linear-gradient(45deg, #1d4ed8, #4ade80);
+  background: #065f46;
   background-size: 200% 200%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -5110,11 +5015,6 @@ defineExpose({
   color: transparent;
   /* 그라데이션 위치를 변화시켜 색상 변화 효과 */
   animation: colorShift 3s ease-in-out infinite alternate;
-}
-
-/* 호버 시 애니메이션 일시정지 */
-.owner-name:hover {
-  animation-play-state: paused;
 }
 
 /* 그라데이션 위치 변화 애니메이션 */
