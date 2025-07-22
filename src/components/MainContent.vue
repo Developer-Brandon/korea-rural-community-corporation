@@ -209,6 +209,130 @@
                             </div>
                           </div>
                         </div>
+
+                        <!-- 🔍 디버깅용 임시 정보 표시 -->
+                        <div
+                          v-if="!msg.isTyping"
+                          style="
+                            background: #f0f0f0;
+                            padding: 8px;
+                            margin: 8px 0;
+                            font-size: 12px;
+                            border-radius: 4px;
+                          "
+                        >
+                          <div><strong>디버깅 정보:</strong></div>
+                          <div>- isOpenAIWebSearchMode: {{ isOpenAIWebSearchMode }}</div>
+                          <div>- msg.isTyping: {{ msg.isTyping }}</div>
+                          <div>- msg.references 존재: {{ !!msg.references }}</div>
+                          <div>
+                            - msg.references 길이:
+                            {{ msg.references ? msg.references.length : 'null' }}
+                          </div>
+                          <div v-if="msg.references">
+                            - references 내용: {{ JSON.stringify(msg.references, null, 2) }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- 📄 POC-RAG 참조문서 영역 (새로 추가!) -->
+                      <div
+                        v-if="
+                          !isOpenAIWebSearchMode &&
+                          !msg.isTyping &&
+                          msg.references &&
+                          msg.references.length > 0
+                        "
+                        class="poc-rag-references"
+                      >
+                        <div class="references-header">
+                          <div class="references-icon-wrapper">
+                            <svg
+                              class="references-icon"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                            >
+                              <path
+                                d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z"
+                                stroke="#3b82f6"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                              <polyline
+                                points="14,2 14,8 20,8"
+                                stroke="#3b82f6"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <span class="references-title">참조문서</span>
+                          <div class="references-count">({{ msg.references.length }})</div>
+                        </div>
+
+                        <div class="references-grid">
+                          <div
+                            v-for="(ref, refIndex) in msg.references"
+                            :key="refIndex"
+                            class="reference-document-card"
+                            :title="`관련도: ${(ref.score * 100).toFixed(1)}% | 단어수: ${ref.wordCount || 'N/A'}`"
+                          >
+                            <!-- PDF 아이콘 -->
+                            <div class="reference-pdf-icon">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z"
+                                  fill="#dc3545"
+                                  stroke="#dc3545"
+                                  stroke-width="0.5"
+                                />
+                                <polyline
+                                  points="14,2 14,8 20,8"
+                                  fill="white"
+                                  stroke="#dc3545"
+                                  stroke-width="1"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <text
+                                  x="12"
+                                  y="16"
+                                  font-family="Arial, sans-serif"
+                                  font-size="6"
+                                  font-weight="bold"
+                                  text-anchor="middle"
+                                  fill="white"
+                                >
+                                  PDF
+                                </text>
+                              </svg>
+                            </div>
+
+                            <!-- 문서명과 정보 -->
+                            <div class="reference-info">
+                              <div class="reference-name">{{ formatDocumentName(ref.name) }}</div>
+                              <div class="reference-meta">
+                                <span class="reference-score"
+                                  >{{ (ref.score * 100).toFixed(1) }}% 관련</span
+                                >
+                                <span class="reference-separator">•</span>
+                                <span class="reference-words">{{ ref.wordCount || 0 }}단어</span>
+                              </div>
+                            </div>
+
+                            <!-- 관련도 바 -->
+                            <div class="reference-relevance-bar">
+                              <div
+                                class="relevance-fill"
+                                :style="{ width: `${ref.score * 100}%` }"
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
                       <!-- 타이핑 인디케이터 -->
@@ -1085,7 +1209,9 @@ const sendOpenAIWebSearch = async (query) => {
     content: '',
     timestamp: new Date(),
     isTyping: true,
-    sources: [],
+    references: [], // 참조문서 정보 추가
+    conversationId: null,
+    messageId: null,
   }
   chatMessages.value.push(aiMessage)
   const aiMessageIndex = chatMessages.value.length - 1
@@ -1465,81 +1591,102 @@ const sendPersonalAgentMessage = async (message) => {
   } catch (error) {
     console.warn('스크롤 이동 실패:', error)
   }
-
   try {
-    console.log('개인 AI Agent API 호출 시작...')
-
-    // 개인 AI Agent API 호출
     const response = await fetch('/api/personal-agent-chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         message: message,
-        conversationId: conversationId.value, // 세션 유지
+        conversationId: conversationId.value,
         userId: userId.value,
-        files: [], // 나중에 파일 업로드 기능 추가시 사용
+        files: [],
       }),
     })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('API 응답 오류:', response.status, errorText)
-      throw new Error(`API 오류 (${response.status}): ${errorText}`)
-    }
-
     const data = await response.json()
+    console.log('🔍 전체 API 응답:', data) // 전체 응답 확인
 
     if (data.success) {
-      // conversation_id 업데이트 (세션 유지를 위해 중요!)
+      // conversation_id 업데이트
       if (data.conversation_id) {
         conversationId.value = data.conversation_id
-        console.log('[Vue] 대화 ID 업데이트:', data.conversation_id)
       }
 
-      if (chatMessages.value[aiMessageIndex]) {
-        chatMessages.value[aiMessageIndex].isTyping = false
+      // 📝 참조문서 정보 추출 및 중복 제거
+      let references = []
 
-        // 메타데이터 저장 (개인 AI Agent 전용)
-        if (data.metadata) {
-          chatMessages.value[aiMessageIndex].metadata = data.metadata
+      console.log('🔍 metadata 존재 여부:', !!data.metadata)
+      console.log(
+        '🔍 retriever_resources 존재 여부:',
+        !!(data.metadata && data.metadata.retriever_resources),
+      )
 
-          // 참조 자료가 있다면 sources에 추가
-          if (data.metadata.retriever_resources && data.metadata.retriever_resources.length > 0) {
-            chatMessages.value[aiMessageIndex].sources = data.metadata.retriever_resources.map(
-              (resource) => ({
-                title: resource.document_name || resource.dataset_name,
-                url: resource.url || '#',
-                snippet: resource.content || '',
-                score: resource.score,
-              }),
-            )
+      if (data.metadata && data.metadata.retriever_resources) {
+        console.log('🔍 retriever_resources 배열:', data.metadata.retriever_resources)
+
+        const uniqueDocuments = new Map()
+
+        data.metadata.retriever_resources.forEach((resource, index) => {
+          console.log(`🔍 리소스 ${index}:`, resource)
+          console.log(`🔍 document_name: "${resource.document_name}"`)
+
+          if (resource.document_name && !uniqueDocuments.has(resource.document_name)) {
+            uniqueDocuments.set(resource.document_name, {
+              name: resource.document_name,
+              datasetName: resource.dataset_name || '',
+              score: resource.score || 0,
+              wordCount: resource.word_count || 0,
+            })
           }
-        }
+        })
 
-        try {
-          await typeMessage(data.response, aiMessageIndex)
-        } catch (typingError) {
-          console.error('타이핑 애니메이션 실패:', typingError)
-          if (chatMessages.value[aiMessageIndex]) {
-            chatMessages.value[aiMessageIndex].content = data.response
-          }
-        }
-
-        // conversationHistory 업데이트 (기존과 동일 - OpenAI 형식으로 유지)
-        conversationHistory.value.push(
-          { role: 'user', content: message },
-          { role: 'assistant', content: data.response },
+        references = Array.from(uniqueDocuments.values()).sort(
+          (a, b) => (b.score || 0) - (a.score || 0),
         )
-        if (conversationHistory.value.length > 20) {
-          conversationHistory.value = conversationHistory.value.slice(-20)
+
+        console.log('📄 파싱된 참조문서 배열:', references)
+        console.log('📄 참조문서 개수:', references.length)
+      }
+
+      // AI 메시지 업데이트
+      if (aiMessageIndex !== -1 && chatMessages.value[aiMessageIndex]) {
+        console.log(
+          '🔍 메시지 업데이트 전 - 기존 references:',
+          chatMessages.value[aiMessageIndex].references,
+        )
+
+        chatMessages.value[aiMessageIndex].content = data.response || ''
+        chatMessages.value[aiMessageIndex].isTyping = false
+        chatMessages.value[aiMessageIndex].references = references // 참조문서 정보 추가
+        chatMessages.value[aiMessageIndex].conversationId = data.conversation_id
+        chatMessages.value[aiMessageIndex].messageId = data.message_id
+
+        console.log(
+          '🔍 메시지 업데이트 후 - 새로운 references:',
+          chatMessages.value[aiMessageIndex].references,
+        )
+        console.log('🔍 전체 메시지 객체:', chatMessages.value[aiMessageIndex])
+      }
+
+      try {
+        await typeMessage(data.response, aiMessageIndex)
+      } catch (typingError) {
+        console.error('타이핑 애니메이션 실패:', typingError)
+        if (chatMessages.value[aiMessageIndex]) {
+          chatMessages.value[aiMessageIndex].content = data.response
         }
       }
-      console.log('개인 AI Agent 응답 성공')
-    } else {
-      throw new Error(data.error || '알 수 없는 오류가 발생했습니다.')
+
+      // conversationHistory 업데이트 (기존과 동일 - OpenAI 형식으로 유지)
+      conversationHistory.value.push(
+        { role: 'user', content: message },
+        { role: 'assistant', content: data.response },
+      )
+      if (conversationHistory.value.length > 20) {
+        conversationHistory.value = conversationHistory.value.slice(-20)
+      }
     }
+    console.log('개인 AI Agent 응답 성공')
   } catch (error) {
     console.error('개인 AI Agent API 오류:', error)
     if (chatMessages.value[aiMessageIndex]) {
@@ -1769,8 +1916,7 @@ const handleCardClick = (cardType) => {
       handleSubmit()
       break
     case 'news-summary':
-      inputText.value =
-        '[POC-RAG] 농어촌공사 관련 업무 분야의 최신 동향을 종합 분석해주세요.우리 기관의 최근 정책 변화와 정부 농어촌 정책 업계 트렌드, 언론 보도를 통합하여 실무진이 알아야할 핵심 인사이트를 제공해주세요.'
+      inputText.value = '[POC-RAG] 직원 경조사휴가에 대해 알려줘'
       handleSubmit()
       break
   }
@@ -1873,6 +2019,23 @@ const handleImageLoad = (event) => {
     const index = Array.from(card.parentElement.children).indexOf(card)
     imageLoaded.value[index] = true
   }
+}
+
+/**
+ * 문서명 포맷팅 함수
+ */
+const formatDocumentName = (docName) => {
+  if (!docName) return ''
+
+  // 파일명이 너무 길면 줄임
+  if (docName.length > 60) {
+    const ext = docName.split('.').pop()
+    const nameWithoutExt = docName.substring(0, docName.lastIndexOf('.'))
+    const shortened = nameWithoutExt.substring(0, 50) + '...'
+    return `${shortened}.${ext}`
+  }
+
+  return docName
 }
 
 // 외부에서 호출 가능하도록 노출
@@ -5032,6 +5195,282 @@ defineExpose({
   .owner-name {
     animation: none;
     background-position: 0% 50%;
+  }
+}
+/**
+ * 📄 POC-RAG 참조문서 스타일 (초록색 메인, 파란색 서브)
+ */
+.poc-rag-references {
+  margin-top: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 12px;
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+}
+
+.references-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.references-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(16, 185, 129, 0.12);
+  border-radius: 6px;
+}
+
+.references-icon {
+  flex-shrink: 0;
+
+  /* 아이콘 색상을 초록색으로 변경 */
+  path {
+    stroke: #10b981;
+  }
+}
+
+.references-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+  flex: 1;
+}
+
+.references-count {
+  font-size: 13px;
+  color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.references-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.reference-document-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    background: rgba(16, 185, 129, 0.03);
+    border-color: rgba(16, 185, 129, 0.3);
+    transform: translateY(-2px);
+    box-shadow:
+      0 4px 12px rgba(16, 185, 129, 0.15),
+      0 2px 8px rgba(59, 130, 246, 0.08);
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+.reference-pdf-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(220, 53, 69, 0.1);
+  border-radius: 8px;
+  filter: drop-shadow(0 2px 4px rgba(220, 53, 69, 0.2));
+
+  /* PDF 아이콘 주변에 초록색 링 효과 */
+  border: 2px solid rgba(16, 185, 129, 0.1);
+}
+
+.reference-info {
+  flex: 1;
+  min-width: 0; /* flex item이 줄어들 수 있도록 */
+}
+
+.reference-name {
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  word-break: break-word;
+  margin-bottom: 4px;
+
+  /* PDF 파일명 스타일 */
+  &:not(:empty) {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+.reference-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.reference-score {
+  font-weight: 500;
+  color: #059669; /* 초록색 유지 */
+  background: rgba(16, 185, 129, 0.1);
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.reference-separator {
+  color: #d1d5db;
+}
+
+.reference-words {
+  color: #3b82f6; /* 파란색으로 변경 (서브 컬러) */
+  font-weight: 500;
+}
+
+.reference-relevance-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(16, 185, 129, 0.1);
+  overflow: hidden;
+}
+
+.relevance-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 70%, #3b82f6 100%);
+  transition: width 0.8s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* 다크모드 지원 (초록색 기반) */
+@media (prefers-color-scheme: dark) {
+  .poc-rag-references {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%);
+    border-color: rgba(16, 185, 129, 0.25);
+  }
+
+  .references-header {
+    border-bottom-color: rgba(16, 185, 129, 0.2);
+  }
+
+  .references-icon-wrapper {
+    background: rgba(16, 185, 129, 0.15);
+  }
+
+  .references-title {
+    color: rgba(17, 24, 39, 0.8);
+  }
+
+  .references-count {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.25);
+  }
+
+  .reference-document-card {
+    background: rgba(17, 24, 39, 0.8);
+    border-color: rgba(16, 185, 129, 0.2);
+
+    &:hover {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.3);
+      box-shadow:
+        0 4px 12px rgba(16, 185, 129, 0.2),
+        0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+  }
+
+  .reference-pdf-icon {
+    border-color: rgba(16, 185, 129, 0.15);
+  }
+
+  .reference-name {
+    color: #f3f4f6;
+  }
+
+  .reference-meta {
+    color: #9ca3af;
+  }
+
+  .reference-score {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.15);
+  }
+
+  .reference-words {
+    color: #60a5fa; /* 다크모드에서 더 밝은 파란색 */
+  }
+
+  .reference-relevance-bar {
+    background: rgba(16, 185, 129, 0.15);
+  }
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .poc-rag-references {
+    margin-top: 12px;
+    padding: 12px;
+  }
+
+  .references-header {
+    margin-bottom: 10px;
+  }
+
+  .references-title {
+    font-size: 14px;
+  }
+
+  .reference-document-card {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .reference-pdf-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .reference-name {
+    font-size: 13px;
+  }
+
+  .reference-meta {
+    font-size: 11px;
+  }
+}
+
+/* 2개 이상일 때 그리드 */
+@media (min-width: 768px) {
+  .references-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 10px;
   }
 }
 </style>
