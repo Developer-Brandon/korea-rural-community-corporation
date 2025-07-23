@@ -1476,9 +1476,9 @@ const sendPersonalAgentMessage = async (message) => {
   hasChatResults.value = true
 
   // RAG 기능 없을 경우에 대한 추가 로직
-  if (!message.includes('[POC-RAG]')) {
-    message = '[POC-RAG] ' + message
-  }
+  // if (!message.includes('[POC-RAG]')) {
+  //   message = '[POC-RAG] ' + message
+  // }
 
   // 사용자 메시지 추가 (기존과 동일)
   const userMessage = {
@@ -1824,8 +1824,7 @@ const handleCardClick = (cardType) => {
 
   switch (cardType) {
     case 'stock-summary':
-      inputText.value =
-        '[POC-RAG] 2025년 7월 기준 최근 3개월 내 업데이트된 농어촌공사 규정, 메뉴얼, 업무 지침을 검색해주세요. 신규 제정된 규정, 개정된 업무 프로세스 등 변경된 최신 자료를 정리해서 알려주세요.'
+      inputText.value = '중국파견시 주택지원은?'
       handleSubmit()
       break
     case 'web-search':
@@ -1834,7 +1833,7 @@ const handleCardClick = (cardType) => {
       handleSubmit()
       break
     case 'news-summary':
-      inputText.value = '[POC-RAG] 직원 경조사휴가에 대해 알려줘'
+      inputText.value = '직원 경조사휴가에 대해 알려줘'
       handleSubmit()
       break
   }
