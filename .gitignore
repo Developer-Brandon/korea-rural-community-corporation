@@ -42,3 +42,4 @@ npm-debug.log*
 # API 키가 포함된 파일들
 config/secrets.js
 
+package-lock.json
