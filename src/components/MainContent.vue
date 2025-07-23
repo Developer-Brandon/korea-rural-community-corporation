@@ -178,7 +178,7 @@
                               :title="image.alt || image.title || '이미지'"
                             >
                               <img
-                                :src="image.url"
+                                :src="getProxiedImageUrl(image.url)"
                                 :alt="image.alt || image.title || '이미지'"
                                 class="thumbnail-image"
                                 @error="handleImageError"
@@ -1741,6 +1741,24 @@ const extractDomain = (url, options = {}) => {
   }
 
 }
+
+// MainContent.vue의 getProxiedImageUrl 함수에 로그 추가
+const getProxiedImageUrl = (originalUrl) => {
+  console.log('🔍 원본 URL:', originalUrl)
+
+  if (!originalUrl) return ''
+
+  if (originalUrl.includes('imgnews.naver.net') || originalUrl.includes('phinf.pstatic.net')) {
+    const encodedUrl = encodeURIComponent(originalUrl)
+    const proxiedUrl = `/api/image-proxy?url=${encodedUrl}`
+    console.log('✅ 프록시 URL:', proxiedUrl)
+    return proxiedUrl
+  }
+
+  console.log('⚠️ 프록시 안함:', originalUrl)
+  return originalUrl
+}
+
 const openSourceLink = (url) => {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
