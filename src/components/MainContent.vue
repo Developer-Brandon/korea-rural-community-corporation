@@ -1173,7 +1173,7 @@ const sendOpenAIWebSearch = async (query) => {
     }
 
     const data = await response.json()
-    console.log('📋 서버 응답 데이터:', data)
+    // console.log('📋 서버 응답 데이터:', data)
 
     if (data.success) {
       if (chatMessages.value[aiMessageIndex]) {
@@ -1744,21 +1744,19 @@ const extractDomain = (url, options = {}) => {
 
 // MainContent.vue의 getProxiedImageUrl 함수에 로그 추가
 const getProxiedImageUrl = (originalUrl) => {
-  console.log('🔍 원본 URL:', originalUrl)
-
   if (!originalUrl) return ''
 
   if (originalUrl.includes('imgnews.naver.net') || originalUrl.includes('phinf.pstatic.net')) {
-    const encodedUrl = encodeURIComponent(originalUrl)
-    const proxiedUrl = `/api/image-proxy?url=${encodedUrl}`
-    console.log('✅ 프록시 URL:', proxiedUrl)
-    return proxiedUrl
+    // 대안 1: 공개 프록시 사용
+    return `https://images.weserv.nl/?url=${encodeURIComponent(originalUrl)}`
+
+    // 대안 2: 우리 프록시 (주석처리)
+    // const encodedUrl = encodeURIComponent(originalUrl)
+    // return `/api/image-proxy?url=${encodedUrl}`
   }
 
-  console.log('⚠️ 프록시 안함:', originalUrl)
   return originalUrl
 }
-
 const openSourceLink = (url) => {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
