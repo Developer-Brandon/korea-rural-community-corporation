@@ -178,7 +178,7 @@
                               :title="image.alt || image.title || '이미지'"
                             >
                               <img
-                                :src="image.url"
+                                :src="getProxiedImageUrl(image.url)"
                                 :alt="image.alt || image.title || '이미지'"
                                 class="thumbnail-image"
                                 @error="handleImageError"
@@ -1739,6 +1739,18 @@ const extractDomain = (url, options = {}) => {
     // 모든 시도 실패 시 fallback 반환
     return fallbackText
   }
+}
+
+// 👆 여기에 추가!
+const getProxiedImageUrl = (originalUrl) => {
+  if (!originalUrl) return ''
+
+  if (originalUrl.includes('imgnews.naver.net') || originalUrl.includes('phinf.pstatic.net')) {
+    const encodedUrl = encodeURIComponent(originalUrl)
+    return `/api/image-proxy?url=${encodedUrl}`
+  }
+
+  return originalUrl
 }
 
 const openSourceLink = (url) => {
