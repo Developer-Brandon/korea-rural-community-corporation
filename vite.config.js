@@ -8,42 +8,42 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-      // 🖼️ 이미지 프록시 - 이 부분만 추가!
-  server.middlewares.use('/api/image-proxy', async (req, res, next) => {
-    if (req.method === 'GET') {
-      const urlParams = new URLSearchParams(req.url.split('?')[1])
-      const imageUrl = urlParams.get('url')
-
-      if (!imageUrl) {
-        res.statusCode = 400
-        res.end('URL parameter required')
-        return
-      }
-
-      try {
-        const response = await fetch(decodeURIComponent(imageUrl), {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; Bot)',
-            'Referer': 'https://news.naver.com/'
-          }
-        })
-
-        const buffer = await response.arrayBuffer()
-        const contentType = response.headers.get('content-type') || 'image/jpeg'
-
-        res.setHeader('Content-Type', contentType)
-        res.setHeader('Access-Control-Allow-Origin', '*')
-        res.end(Buffer.from(buffer))
-      } catch (error) {
-        res.statusCode = 500
-        res.end('Error fetching image')
-      }
-    }
-  }),
     // ✅ API 핸들러 플러그인 추가
     {
       name: 'api-handler',
       configureServer(server) {
+              // 🖼️ 이미지 프록시 - 이 부분만 추가!
+        server.middlewares.use('/api/image-proxy', async (req, res, next) => {
+          if (req.method === 'GET') {
+            const urlParams = new URLSearchParams(req.url.split('?')[1])
+            const imageUrl = urlParams.get('url')
+
+            if (!imageUrl) {
+              res.statusCode = 400
+              res.end('URL parameter required')
+              return
+            }
+
+            try {
+              const response = await fetch(decodeURIComponent(imageUrl), {
+                headers: {
+                  'User-Agent': 'Mozilla/5.0 (compatible; Bot)',
+                  'Referer': 'https://news.naver.com/'
+                }
+              })
+
+              const buffer = await response.arrayBuffer()
+              const contentType = response.headers.get('content-type') || 'image/jpeg'
+
+              res.setHeader('Content-Type', contentType)
+              res.setHeader('Access-Control-Allow-Origin', '*')
+              res.end(Buffer.from(buffer))
+            } catch (error) {
+              res.statusCode = 500
+              res.end('Error fetching image')
+            }
+          }
+        }),
         server.middlewares.use('/api/openai-chat', async (req, res, next) => {
           console.log(`[API] ${req.method} /api/openai-chat 요청 받음`)
 
