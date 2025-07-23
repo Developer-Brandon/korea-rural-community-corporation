@@ -913,7 +913,7 @@ const featureCards = ref([
   {
     type: 'news-summary',
     title: '농어촌의 전문 지식 검색',
-    description: '농',
+    description: '농어촌공사의 전문 지식과 자료를 검색',
     iconBg: '#E5EFFC',
     icon: thirdCardIcon,
   },
