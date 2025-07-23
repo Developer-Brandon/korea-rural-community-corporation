@@ -147,20 +147,6 @@
                         "
                         class="openai-web-sources"
                       >
-                        <div class="sources-horizontal">
-                          <div
-                            v-for="(source, sourceIndex) in msg.sources"
-                            :key="sourceIndex"
-                            class="source-icon-card"
-                            @click="openSourceLink(source.url)"
-                            :title="source.title"
-                          >
-                            <div class="brand-initial" :style="getBrandStyle(source.url)">
-                              {{ getBrandInitial(source.url) }}
-                            </div>
-                          </div>
-                        </div>
-
                         <div class="sources-vertical">
                           <div
                             v-for="(source, sourceIndex) in msg.sources"
@@ -1854,46 +1840,6 @@ const handleCardClick = (cardType) => {
   }
 
   emit('card-clicked', cardType)
-}
-
-// 브랜드 관련 헬퍼 함수들
-const getBrandInitial = (url) => {
-  const domain = extractDomain(url)
-
-  if (domain.includes('naver')) return 'N'
-  if (domain.includes('google')) return 'G'
-  if (domain.includes('wikipedia')) return 'W'
-  if (domain.includes('yonhap')) return '연'
-  if (domain.includes('mk.co.kr')) return '매'
-  if (domain.includes('truefriend')) return '한'
-  if (domain.includes('krx.co.kr')) return 'K'
-  if (domain.includes('gov.kr')) return '정'
-
-  return domain.charAt(0).toUpperCase()
-}
-
-const getBrandStyle = (url) => {
-  const domain = extractDomain(url)
-
-  const brandColors = {
-    naver: { background: 'linear-gradient(135deg, #03C75A 0%, #05B552 100%)', color: 'white' },
-    google: { background: 'linear-gradient(135deg, #4285F4 0%, #34A853 100%)', color: 'white' },
-    wikipedia: { background: 'linear-gradient(135deg, #000000 0%, #333333 100%)', color: 'white' },
-    yonhap: { background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)', color: 'white' },
-    'mk.co.kr': { background: 'linear-gradient(135deg, #E31E24 0%, #FF4444 100%)', color: 'white' },
-    truefriend: { background: 'linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%)', color: 'white' },
-    'krx.co.kr': {
-      background: 'linear-gradient(135deg, #059669 0%, #10B981 100%)',
-      color: 'white',
-    },
-    'gov.kr': { background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)', color: 'white' },
-  }
-
-  for (const [key, style] of Object.entries(brandColors)) {
-    if (domain.includes(key)) return style
-  }
-
-  return { background: 'linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%)', color: 'white' }
 }
 
 const debugInitialState = () => {
@@ -4190,22 +4136,6 @@ defineExpose({
   font-family: 'Pretendard', sans-serif;
 }
 
-/* ✨ 가로 아이콘 배치 스타일 */
-.sources-horizontal {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 12px;
-  padding: 8px 0;
-  overflow-x: auto;
-
-  /* 스크롤바 숨기기 */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-}
-
 .source-icon-card {
   flex-shrink: 0; /* 크기 고정 */
   cursor: pointer;
@@ -4233,14 +4163,6 @@ defineExpose({
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
   }
-}
-
-/* 5개 이상일 때 더 작게 */
-.sources-horizontal:has(> .source-icon-card:nth-child(5)) .source-icon-card .brand-initial {
-  width: 32px;
-  height: 32px;
-  font-size: 14px;
-  border-radius: 8px;
 }
 
 /* 🎯 애니메이션 */
@@ -4264,22 +4186,6 @@ defineExpose({
   }
 }
 
-/* ✨ 가로 아이콘 배치 스타일 (기존 유지) */
-.sources-horizontal {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 12px;
-  padding: 8px 0;
-  overflow-x: auto;
-
-  /* 스크롤바 숨기기 */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-}
-
 .source-icon-card {
   flex-shrink: 0; /* 크기 고정 */
   cursor: pointer;
@@ -4307,14 +4213,6 @@ defineExpose({
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
   }
-}
-
-/* 5개 이상일 때 더 작게 */
-.sources-horizontal:has(> .source-icon-card:nth-child(5)) .source-icon-card .brand-initial {
-  width: 32px;
-  height: 32px;
-  font-size: 14px;
-  border-radius: 8px;
 }
 
 /* 애니메이션 키프레임 */
@@ -4904,10 +4802,6 @@ defineExpose({
   .action-button {
     width: 28px;
     height: 28px;
-  }
-
-  .sources-horizontal {
-    gap: 8px;
   }
 
   .source-icon-card .brand-initial {
