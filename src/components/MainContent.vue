@@ -221,35 +221,6 @@
                         "
                         class="poc-rag-references"
                       >
-                        <div class="references-header">
-                          <div class="references-icon-wrapper">
-                            <svg
-                              class="references-icon"
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <path
-                                d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z"
-                                stroke="#3b82f6"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                              <polyline
-                                points="14,2 14,8 20,8"
-                                stroke="#3b82f6"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                              />
-                            </svg>
-                          </div>
-                          <span class="references-title">참조문서</span>
-                          <div class="references-count">({{ msg.references.length }})</div>
-                        </div>
-
                         <div class="references-grid">
                           <div
                             v-for="(ref, refIndex) in msg.references"
@@ -291,21 +262,6 @@
                             <!-- 문서명과 정보 -->
                             <div class="reference-info">
                               <div class="reference-name">{{ formatDocumentName(ref.name) }}</div>
-                              <div class="reference-meta">
-                                <span class="reference-score"
-                                  >{{ (ref.score * 100).toFixed(1) }}% 관련</span
-                                >
-                                <span class="reference-separator">•</span>
-                                <span class="reference-words">{{ ref.wordCount || 0 }}단어</span>
-                              </div>
-                            </div>
-
-                            <!-- 관련도 바 -->
-                            <div class="reference-relevance-bar">
-                              <div
-                                class="relevance-fill"
-                                :style="{ width: `${ref.score * 100}%` }"
-                              ></div>
                             </div>
                           </div>
                         </div>
@@ -971,7 +927,7 @@ const featureCards = ref([
   {
     type: 'news-summary',
     title: '농어촌의 전문 지식 검색',
-    description: '농어촌만의 전문 지식을 AI로',
+    description: '농',
     iconBg: '#E5EFFC',
     icon: thirdCardIcon,
   },
@@ -5179,8 +5135,7 @@ defineExpose({
 .poc-rag-references {
   margin-top: 16px;
   padding: 16px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: lightgray;
   border-radius: 12px;
   font-size: 14px;
   backdrop-filter: blur(10px);
@@ -5242,22 +5197,12 @@ defineExpose({
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: white;
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  background: rgb(235, 233, 233);
   border-radius: 10px;
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-
-  &:hover {
-    background: rgba(16, 185, 129, 0.03);
-    border-color: rgba(16, 185, 129, 0.3);
-    transform: translateY(-2px);
-    box-shadow:
-      0 4px 12px rgba(16, 185, 129, 0.15),
-      0 2px 8px rgba(59, 130, 246, 0.08);
-  }
 
   &:active {
     transform: translateY(-1px);
@@ -5285,8 +5230,7 @@ defineExpose({
 }
 
 .reference-name {
-  color: #1f2937;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 600;
   line-height: 1.3;
   word-break: break-word;
@@ -5344,70 +5288,6 @@ defineExpose({
   border-radius: 0 2px 2px 0;
 }
 
-/* 다크모드 지원 (초록색 기반) */
-@media (prefers-color-scheme: dark) {
-  .poc-rag-references {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%);
-    border-color: rgba(16, 185, 129, 0.25);
-  }
-
-  .references-header {
-    border-bottom-color: rgba(16, 185, 129, 0.2);
-  }
-
-  .references-icon-wrapper {
-    background: rgba(16, 185, 129, 0.15);
-  }
-
-  .references-title {
-    color: rgba(17, 24, 39, 0.8);
-  }
-
-  .references-count {
-    color: #10b981;
-    background: rgba(16, 185, 129, 0.15);
-    border-color: rgba(16, 185, 129, 0.25);
-  }
-
-  .reference-document-card {
-    background: rgba(17, 24, 39, 0.8);
-    border-color: rgba(16, 185, 129, 0.2);
-
-    &:hover {
-      background: rgba(16, 185, 129, 0.08);
-      border-color: rgba(16, 185, 129, 0.3);
-      box-shadow:
-        0 4px 12px rgba(16, 185, 129, 0.2),
-        0 2px 8px rgba(59, 130, 246, 0.1);
-    }
-  }
-
-  .reference-pdf-icon {
-    border-color: rgba(16, 185, 129, 0.15);
-  }
-
-  .reference-name {
-    color: #f3f4f6;
-  }
-
-  .reference-meta {
-    color: #9ca3af;
-  }
-
-  .reference-score {
-    color: #10b981;
-    background: rgba(16, 185, 129, 0.15);
-  }
-
-  .reference-words {
-    color: #60a5fa; /* 다크모드에서 더 밝은 파란색 */
-  }
-
-  .reference-relevance-bar {
-    background: rgba(16, 185, 129, 0.15);
-  }
-}
-
 /* 모바일 반응형 */
 @media (max-width: 768px) {
   .poc-rag-references {
@@ -5424,7 +5304,7 @@ defineExpose({
   }
 
   .reference-document-card {
-    padding: 10px;
+    padding: 5%;
     gap: 10px;
   }
 

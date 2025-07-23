@@ -905,6 +905,14 @@ async function performRealGoogleWebSearch(query, options = {}) {
   }
 }
 
+const cleanTextContent = (text) => {
+  if (!text || typeof text !== 'string') return text
+
+  return text
+    .replace(/#+\s*/g, '') // 마크다운 헤딩 제거
+    .trim()
+}
+
 // 🤖 강력한 OpenAI 답변 생성
 async function generateSmartAnswer(query, latestInfo = null, googleSources = []) {
   if (!openai) {
@@ -986,25 +994,25 @@ ${context}`,
     if (latestInfo) {
       return `# ${query}
 
-## 📋 최신 정보 (${new Date().getFullYear()}년 현재)
+📋 최신 정보 (${new Date().getFullYear()}년 현재)
 
 현재 **한국농어촌공사의 사장**은 **${latestInfo.name}**입니다.
 
-### 📊 상세 정보
+📊 상세 정보
 - **성명**: ${latestInfo.name}
 - **직책**: ${latestInfo.title}
 - **기준 연도**: ${latestInfo.year}년
 - **정보 출처**: ${latestInfo.source}
 
-### 🌐 공식 정보 확인
+🌐 공식 정보 확인
 한국농어촌공사 공식 홈페이지의 조직도 및 임원 소개 페이지에서 최신 정보를 확인하실 수 있습니다.
 
 ---
 *${new Date().toLocaleDateString('ko-KR')} 기준 최신 정보입니다.*`
     } else if (googleSources && googleSources.length > 0) {
-      let response = `# ${query}\n\n## 🔍 검색 결과\n\n`
+      let response = `# ${query}\n\n 🔍 검색 결과\n\n`
       googleSources.slice(0, 3).forEach((source, index) => {
-        response += `### ${index + 1}. ${source.title}\n\n`
+        response += `${index + 1}. ${source.title}\n\n`
         response += `${source.snippet}\n\n`
         response += `**출처**: [${source.domain}](${source.url})\n\n`
       })
@@ -1053,7 +1061,7 @@ async function performWorkingSearch(query) {
     let finalResponse = aiResponse
 
     // 참고 자료 섹션 추가
-    finalResponse += '\n\n## 📚 참고 자료\n\n'
+    finalResponse += '\n\n 📚 참고 자료\n\n'
     sources.forEach((source, index) => {
       const priority = source.priority ? '⭐ ' : ''
       finalResponse += `${index + 1}. ${priority}**[${source.title}](${source.url})**\n`
@@ -1078,7 +1086,7 @@ async function performWorkingSearch(query) {
 
     return {
       success: true,
-      response: finalResponse,
+      response: cleanTextContent(finalResponse),
       sources: sources,
       images: images,
       searchPerformed: true,
