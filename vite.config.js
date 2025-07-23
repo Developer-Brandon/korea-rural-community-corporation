@@ -119,4 +119,44 @@ export default defineConfig({
   define: {
     'import.meta.env': 'import.meta.env',
   },
+  // 🚀 Mixed Content 해결을 위한 개발 서버 설정 추가
+  server: {
+    headers: {
+      // Content Security Policy - 모든 이미지 소스 허용
+      'Content-Security-Policy': [
+        "default-src 'self' 'unsafe-inline' 'unsafe-eval' *",
+        "img-src * data: blob: 'unsafe-inline' http: https:",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' * data: blob:",
+        "style-src 'self' 'unsafe-inline' * data: blob:",
+        'connect-src *',
+        'font-src *',
+        'object-src *',
+        'media-src *',
+        'child-src *',
+        'frame-src *',
+      ].join('; '),
+
+      // 추가 보안 헤더
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'no-referrer-when-downgrade',
+
+      // CORS 헤더
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  },
+
+  // 🎯 빌드 시에도 적용되도록 Preview 서버 설정
+  preview: {
+    headers: {
+      'Content-Security-Policy': [
+        "default-src 'self' 'unsafe-inline' 'unsafe-eval' *",
+        "img-src * data: blob: 'unsafe-inline' http: https:",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' * data: blob:",
+        "style-src 'self' 'unsafe-inline' * data: blob:",
+        'connect-src *',
+      ].join('; '),
+    },
+  },
 })

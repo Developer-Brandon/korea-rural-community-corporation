@@ -159,17 +159,17 @@
             <div class="chat-list">
               <!-- 활성 채팅 -->
               <div class="chat-item active-chat">
-                <span>테스트테스트테스트</span>
+                <span>한국농어촌공사의 설립 목적....</span>
                 <div class="chat-indicator"></div>
               </div>
 
               <!-- 일반 채팅들 -->
               <button class="chat-item">
-                <span>테스트테스트테스트</span>
+                <span>농지은행이 뭐야?</span>
               </button>
 
               <button class="chat-item">
-                <span>테스트테스트테스트</span>
+                <span>넌 어떤 챗봇이야?</span>
               </button>
             </div>
           </div>

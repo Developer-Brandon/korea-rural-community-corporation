@@ -1,0 +1,37 @@
+{
+  "framework": "vite",
+  "buildCommand": "rm -rf node_modules package-lock.json && npm install && npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install --force",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self' 'unsafe-inline' 'unsafe-eval' * data: blob:; img-src * data: blob: 'unsafe-inline' http: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' * data: blob:; style-src 'self' 'unsafe-inline' * data: blob:; connect-src *; font-src *; object-src *; media-src *; child-src *; frame-src *;"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer-when-downgrade"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
+}
