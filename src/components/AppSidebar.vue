@@ -159,7 +159,7 @@
             <div class="chat-list">
               <!-- 활성 채팅 -->
               <div class="chat-item active-chat">
-                <span>한국농어촌공사의 설립 목적....</span>
+                <span>한국농어촌공사의 최신동향....</span>
                 <div class="chat-indicator"></div>
               </div>
 

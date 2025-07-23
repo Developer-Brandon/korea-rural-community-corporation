@@ -1829,7 +1829,7 @@ const handleCardClick = (cardType) => {
       break
     case 'web-search':
       isOpenAIWebSearchMode.value = true
-      inputText.value = '한국농어촌공사의 설립 목적과 역사에 대해 알려줘. 궁금해'
+      inputText.value = '한국농어촌공사의 최신 동향에 대해 알려줄 수 있어?'
       handleSubmit()
       break
     case 'news-summary':
