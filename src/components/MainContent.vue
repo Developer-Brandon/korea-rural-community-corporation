@@ -22,8 +22,8 @@
               >님
             </h1>
             <p class="welcome-subtitle">
-              일하는 방식을 바꾸는 AI 파트너<br />
-              스마트하고 효율적인 업무를 경험해보세요.
+              일하는 방식을 바꾸는 생성형 AI<br />
+              오늘 오후 2시 대강당에서 만나보세요!
             </p>
           </div>
 
@@ -1739,7 +1739,6 @@ const extractDomain = (url, options = {}) => {
     // 모든 시도 실패 시 fallback 반환
     return fallbackText
   }
-
 }
 
 // MainContent.vue의 getProxiedImageUrl 함수에 로그 추가

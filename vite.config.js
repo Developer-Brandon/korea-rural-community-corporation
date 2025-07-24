@@ -135,11 +135,9 @@ export default defineConfig({
         'child-src *',
         'frame-src *',
       ].join('; '),
-
       // 추가 보안 헤더
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'no-referrer-when-downgrade',
-
       // CORS 헤더
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
